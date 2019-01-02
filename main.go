@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 )
 
-var generalPage, myselfStart, myselfStop, exit *systray.MenuItem
+var generalPage, myselfStart, myselfStop, workStart, workStop, exit *systray.MenuItem
 
 func main() {
 	systray.Run(onReady, onExit)
@@ -33,6 +33,18 @@ func initTrayMenu() {
 	myselfStop = systray.AddMenuItem(getText("Stop myself timer"), getText("Myself timer stop"))
 	myselfStop.Hide()
 
+	myselfStart = systray.AddMenuItem(getText("Start myself timer"), getText("Work timer start"))
+	myselfStart.Hide()
+
+	myselfStop = systray.AddMenuItem(getText("Stop myself timer"), getText("Work timer stop"))
+	myselfStop.Hide()
+
+	workStart = systray.AddMenuItem(getText("Start work timer"), getText("Work timer start"))
+	workStart.Hide()
+
+	workStop = systray.AddMenuItem(getText("Stop work timer"), getText("Work timer stop"))
+	workStop.Hide()
+
 	systray.AddSeparator()
 
 	exit = systray.AddMenuItem(getText("Exit"), getText("Exit"))
@@ -41,6 +53,7 @@ func initTrayMenu() {
 func enableTrayMenu() {
 	generalPage.Show()
 	myselfStart.Show()
+	workStart.Show()
 }
 
 func firstInit() {
@@ -67,6 +80,10 @@ func updateClick() {
 			handleMyselfStart()
 		case <-myselfStop.ClickedCh:
 			handleMyselfStop()
+		case <-workStart.ClickedCh:
+			handleWorkStart()
+		case <-workStop.ClickedCh:
+			handleWorkStop()
 		case <-exit.ClickedCh:
 			systray.Quit()
 		}
