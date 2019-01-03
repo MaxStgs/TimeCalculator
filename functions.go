@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+)
 
 func generateURI() (s string) {
 	s = "http://" + site + ":" + port
@@ -9,6 +12,11 @@ func generateURI() (s string) {
 
 func generateIndex() (s string) {
 	s = generateURI() + "/index"
+	return
+}
+
+func generateSettigs() (s string) {
+	s = generateURI() + "/settings"
 	return
 }
 
@@ -34,4 +42,13 @@ func errorHandler(m string, errorType Error) {
 	default:
 		fmt.Println("Unhandled errorHandler: ", m)
 	}
+}
+
+func getIcon(s string) []byte {
+	b, err := ioutil.ReadFile(s)
+	if err != nil {
+		errorHandler("main.getIcon() err: "+err.Error(), console)
+	}
+
+	return b
 }

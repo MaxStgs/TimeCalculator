@@ -15,9 +15,18 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func settingsHandler(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("templates/settings.html")
+	err := t.Execute(w, nil)
+	if err != nil {
+		return
+	}
+}
+
 func RunWebServer() {
 	routes := mux.NewRouter()
 	routes.HandleFunc("/index", indexHandler)
+	routes.HandleFunc("/settings", settingsHandler)
 
 	http.Handle("/", routes)
 
