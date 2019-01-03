@@ -20,6 +20,11 @@ func RunWebServer() {
 	routes.HandleFunc("/index", indexHandler)
 
 	http.Handle("/", routes)
+
+	http.Handle("/static/",
+		http.StripPrefix("/static/",
+			http.FileServer(http.Dir("static"))))
+
 	err := http.ListenAndServe(":8593", nil)
 	if err != nil {
 		fmt.Println("It's Server.RunWebServer() we got problem")

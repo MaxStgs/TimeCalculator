@@ -30,7 +30,7 @@ func errorHandler(m string, errorType Error) {
 		fmt.Println(m)
 	case file:
 		fmt.Println("ToFile: ", m)
-	case unknown:
+	case unknownError:
 	default:
 		fmt.Println("Unhandled errorHandler: ", m)
 	}

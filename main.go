@@ -17,6 +17,7 @@ func onReady() {
 	firstInit()
 	initTrayMenu()
 	enableTrayMenu()
+	InitDB()
 
 	go RunWebServer()
 	go update()
