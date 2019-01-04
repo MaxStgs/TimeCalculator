@@ -11,7 +11,6 @@ func main() {
 func onReady() {
 	InitDB()
 	initTray()
-	initTrayMenu()
 
 	go RunWebServer()
 	go RunSocketServer()

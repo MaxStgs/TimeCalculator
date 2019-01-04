@@ -38,6 +38,8 @@ func initTray() {
 	} else {
 		systray.SetIcon(appData.Icon)
 	}
+
+	initTrayMenu()
 }
 
 func initTrayMenu() {
@@ -81,28 +83,15 @@ func initTrayMenu() {
 }
 
 func trayMenuHandler() {
-	/*
-		for {
-			select {
-			case <-generalPage.ClickedCh:
-				_ = browser.OpenURL(generateIndex())
-			case <-myselfStart.ClickedCh:
-				handleMyselfStart()
-			case <-myselfStop.ClickedCh:
-				handleMyselfStop()
-			case <-workStart.ClickedCh:
-				handleWorkStart()
-			case <-workStop.ClickedCh:
-				handleWorkStop()
-			case <-settings.ClickedCh:
-				handleSettings()
-			case <-exit.ClickedCh:
-				systray.Quit()
-			}
-		}
-	*/
 	for {
-		select {}
+		select {
+		case <-generalPage.ClickedCh:
+			_ = browser.OpenURL(generateMenu())
+		case <-settings.ClickedCh:
+			handleSettings()
+		case <-exit.ClickedCh:
+			systray.Quit()
+		}
 	}
 }
 

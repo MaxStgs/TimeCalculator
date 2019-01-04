@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS Timers (
 
 DROP TABLE IF EXISTS Events;
 CREATE TABLE IF NOT EXISTS Events (
-  id_workTime         INTEGER       PRIMARY KEY AUTOINCREMENT,
-  moment_workTime     DATETIME,
+  id_event         INTEGER       PRIMARY KEY AUTOINCREMENT,
+  moment_event     DATETIME,
 --   type                CHAR(1)       NOT NULL DEFAULT('U') REFERENCES EventTypes(eventType),
   type_timer_id       INTEGER       NOT NULL REFERENCES Timers(timer_id),
   state               CHAR(1)       NOT NULL DEFAULT('U') REFERENCES EventStates(eventState)

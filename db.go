@@ -34,7 +34,7 @@ func handleEvent(idTimer int, state EventState) {
 }
 
 func addEvent(time time.Time, idTimer int, state EventState) int64 {
-	stmt, err := db.Prepare("INSERT INTO Events(moment_workTime, type_timer_id, state) values(?,?,?)")
+	stmt, err := db.Prepare("INSERT INTO Events(moment_event, type_timer_id, state) values(?,?,?)")
 	if err != nil {
 		fmt.Println(err.Error())
 		return -1
@@ -63,6 +63,20 @@ func LoadAppData() AppData {
 	rows.Next()
 	appData := AppData{}
 	err = rows.Scan(&appData.Title, &appData.Tooltip, &appData.Icon)
+
+	if appData.Title == "" {
+		appData.Title = ApplicationName
+	}
+
+	if appData.Tooltip == "" {
+		appData.Tooltip = ApplicationTooltip
+	}
+
+	if appData.Icon == nil {
+		appData.Icon = getIcon(defaultIconLocation)
+		appData.IconLocation = "static/" + defaultIconLocation
+	}
+
 	return appData
 }
 
@@ -79,4 +93,19 @@ func LoadTimers() []Timer {
 		timers = append(timers, timer)
 	}
 	return timers
+}
+
+func LoadEventsByTimerId(idTimer int) []Event {
+	rows, err := db.Query("SELECT * FROM Events where type_timer_id = ? ORDER BY id_event;", idTimer)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+	var events []Event
+	for rows.Next() {
+		event := Event{}
+		err = rows.Scan(&event.Id, &event.Moment, &event.TimerId, &event.State)
+		events = append(events, event)
+	}
+	return events
 }

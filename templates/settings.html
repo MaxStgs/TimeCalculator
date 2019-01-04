@@ -10,21 +10,26 @@
     <table>
         <tr>
             <td>Название приложения</td>
-            <td><input type="text" name="app_name"></td>
+            <td><input type="text" name="app_name" value="{{.AppData.Title}}"></td>
         </tr>
         <tr>
             <td>Подпись приложения</td>
-            <td><input type="text" name="app_tooltip"></td>
+            <td><input type="text" name="app_tooltip" value="{{.AppData.Tooltip}}"></td>
         </tr>
         <tr>
-            <td>Иконка приложения<input type="file"></td>
+            <td colspan="2">Иконка приложения <input type="file"></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <img width="128" height="128" src="{{.AppData.IconLocation}}" alt="Icon">
+            </td>
         </tr>
     </table>
     <br>
 </div>
 <p>
     <input type="button" value="Сохранить">
-    <input type="button" value="На главную">
+    <a href="menu">На главную</a>
 </p>
 </body>
 </html>

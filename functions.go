@@ -15,6 +15,11 @@ func generateIndex() (s string) {
 	return
 }
 
+func generateMenu() (s string) {
+	s = generateURI() + "/menu"
+	return
+}
+
 func generateSettigs() (s string) {
 	s = generateURI() + "/settings"
 	return

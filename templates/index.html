@@ -6,7 +6,11 @@
 </head>
 <body>
 <p>Текущее время: <span id="current_time">сейчас</span></p>
-<p>Количество работы сегодня: <span id="work_time">количество_работы</span></p>
+<div>
+{{range .Timers}}
+    <p>Счетчик к "{{.TimerInfo.Name}}". День: {{.CountToday}}, Неделя: {{.CountWeek}}, Месяц: {{.CountMonth}}</p>
+{{end}}
+</div>
 <script src="static/js/client.js"></script>
 </body>
 </html>
