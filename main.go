@@ -9,10 +9,9 @@ func main() {
 }
 
 func onReady() {
+	InitDB()
 	initTray()
 	initTrayMenu()
-	enableTrayMenu()
-	InitDB()
 
 	go RunWebServer()
 	go RunSocketServer()

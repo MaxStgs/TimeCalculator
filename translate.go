@@ -10,5 +10,7 @@ var (
 		"General page":       {"Главная страница", "Allgemeine Seite"},
 		"Settings":           {"Настройки", "Einstellungen"},
 		"Exit":               {"Выход", "Ausgang"},
+		"Start":              {"Запустить", ""},
+		"End":                {"Остановить", ""},
 	}
 )

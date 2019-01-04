@@ -1,5 +1,7 @@
 package main
 
+import "github.com/getlantern/systray"
+
 type Error int
 
 const (
@@ -31,3 +33,8 @@ const (
 	creatureEventType EventType = "C"
 	workEventType     EventType = "W"
 )
+
+type timerButton struct {
+	timerId int
+	button  *systray.MenuItem
+}

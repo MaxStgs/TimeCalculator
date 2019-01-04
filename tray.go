@@ -8,15 +8,15 @@ import (
 
 var (
 	generalPage,
-	myselfStart,
-	myselfStop,
-	workStart,
-	workStop,
 	settings,
 	exit *systray.MenuItem
+
+	buttons = make(map[int][]timerButton, 0)
 )
 
 func initTray() {
+	appData := LoadAppData()
+	/* Now data load from DB
 	systray.SetTitle(getText("Time Calculator"))
 	systray.SetTooltip(getText("Time Calculator"))
 	icon := getIcon("assets/icon.ico")
@@ -25,60 +25,84 @@ func initTray() {
 		return
 	}
 	systray.SetIcon(icon)
+	*/
+	systray.SetTitle(appData.Title)
+	systray.SetTooltip(appData.Tooltip)
+	if appData.Icon == nil {
+		icon := getIcon("assets/icon.ico")
+		if icon == nil {
+			fmt.Println("onReady.getIcon is nil")
+			return
+		}
+		systray.SetIcon(icon)
+	} else {
+		systray.SetIcon(appData.Icon)
+	}
 }
 
 func initTrayMenu() {
-	generalPage = systray.AddMenuItem(getText("General page"), getText("General page"))
-	generalPage.Hide()
 
-	myselfStart = systray.AddMenuItem(getText("Start myself timer"), getText("Myself timer start"))
-	myselfStart.Hide()
+	timers := LoadTimers()
+	if timers != nil {
+		for _, v := range timers {
+			timerStartName := getText("Start") + " " + v.Name
+			timerStart := systray.AddMenuItem(timerStartName, timerStartName)
+			timerEndName := getText("End") + " " + v.Name
+			timerEnd := systray.AddMenuItem(timerEndName, timerEndName)
+			timerEnd.Hide()
+			index := len(buttons)
+			buttons[index] = []timerButton{{v.Id, timerStart}, {v.Id, timerEnd}}
 
-	myselfStop = systray.AddMenuItem(getText("Stop myself timer"), getText("Myself timer stop"))
-	myselfStop.Hide()
+			go func() {
+				for {
+					select {
+					case <-timerStart.ClickedCh:
+						handleTimerStart(index)
+					case <-timerEnd.ClickedCh:
+						handleTimerStop(index)
+					}
+				}
+			}()
+		}
+	}
+	/*
+		myselfStart = systray.AddMenuItem(getText("Start myself timer"), getText("Myself timer start"))
+		myselfStart.Hide()
 
-	myselfStart = systray.AddMenuItem(getText("Start myself timer"), getText("Work timer start"))
-	myselfStart.Hide()
-
-	myselfStop = systray.AddMenuItem(getText("Stop myself timer"), getText("Work timer stop"))
-	myselfStop.Hide()
-
-	workStart = systray.AddMenuItem(getText("Start work timer"), getText("Work timer start"))
-	workStart.Hide()
-
-	workStop = systray.AddMenuItem(getText("Stop work timer"), getText("Work timer stop"))
-	workStop.Hide()
+		myselfStop = systray.AddMenuItem(getText("Stop myself timer"), getText("Myself timer stop"))
+		myselfStop.Hide()
+	*/
 
 	systray.AddSeparator()
 
+	generalPage = systray.AddMenuItem(getText("General page"), getText("General page"))
 	settings = systray.AddMenuItem(getText("Settings"), getText("Settings"))
 	exit = systray.AddMenuItem(getText("Exit"), getText("Exit"))
 }
 
-func enableTrayMenu() {
-	generalPage.Show()
-	myselfStart.Show()
-	workStart.Show()
-}
-
 func trayMenuHandler() {
-	for {
-		select {
-		case <-generalPage.ClickedCh:
-			_ = browser.OpenURL(generateIndex())
-		case <-myselfStart.ClickedCh:
-			handleMyselfStart()
-		case <-myselfStop.ClickedCh:
-			handleMyselfStop()
-		case <-workStart.ClickedCh:
-			handleWorkStart()
-		case <-workStop.ClickedCh:
-			handleWorkStop()
-		case <-settings.ClickedCh:
-			handleSettings()
-		case <-exit.ClickedCh:
-			systray.Quit()
+	/*
+		for {
+			select {
+			case <-generalPage.ClickedCh:
+				_ = browser.OpenURL(generateIndex())
+			case <-myselfStart.ClickedCh:
+				handleMyselfStart()
+			case <-myselfStop.ClickedCh:
+				handleMyselfStop()
+			case <-workStart.ClickedCh:
+				handleWorkStart()
+			case <-workStop.ClickedCh:
+				handleWorkStop()
+			case <-settings.ClickedCh:
+				handleSettings()
+			case <-exit.ClickedCh:
+				systray.Quit()
+			}
 		}
+	*/
+	for {
+		select {}
 	}
 }
 
@@ -86,28 +110,18 @@ func trayUpdate() {
 
 }
 
-func handleMyselfStart() {
-	myselfStart.Hide()
-	myselfStop.Show()
-	handleEvent(creatureEventType, start)
+func handleTimerStart(index int) {
+	//fmt.Println("Hello, it is Timer Start")
+	buttons[index][0].button.Hide()
+	buttons[index][1].button.Show()
+	handleEvent(buttons[index][0].timerId, start)
 }
 
-func handleMyselfStop() {
-	myselfStart.Show()
-	myselfStop.Hide()
-	handleEvent(creatureEventType, end)
-}
-
-func handleWorkStart() {
-	workStart.Hide()
-	workStop.Show()
-	handleEvent(workEventType, start)
-}
-
-func handleWorkStop() {
-	workStart.Show()
-	workStop.Hide()
-	handleEvent(workEventType, end)
+func handleTimerStop(index int) {
+	//fmt.Println("Hello, it is Timer Stop")
+	buttons[index][1].button.Hide()
+	buttons[index][0].button.Show()
+	handleEvent(buttons[index][0].timerId, end)
 }
 
 func handleSettings() {
