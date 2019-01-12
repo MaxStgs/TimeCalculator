@@ -21,9 +21,9 @@ const (
 type EventState string
 
 const (
-	unknownState EventState = "U"
-	start        EventState = "S"
-	end          EventState = "E"
+	UnknownState EventState = "U"
+	StartState   EventState = "S"
+	EndState     EventState = "E"
 )
 
 type EventType string
@@ -38,3 +38,13 @@ type timerButton struct {
 	timerId int
 	button  *systray.MenuItem
 }
+
+type DebugLevelType int
+
+const (
+	DebugLevelNoDebug DebugLevelType = 0
+	DebugLevelMinimal DebugLevelType = 1
+	DebugLevelNormal  DebugLevelType = 2
+	DebugLevelMuch    DebugLevelType = 3
+	DebugLevelFull    DebugLevelType = 4
+)

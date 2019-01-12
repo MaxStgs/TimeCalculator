@@ -7,9 +7,12 @@
 <body>
 <p>Текущее время: <span id="current_time">сейчас</span></p>
 <div>
-{{range .Timers}}
-    <p>Счетчик к "{{.TimerInfo.Name}}". День: {{.CountToday}}, Неделя: {{.CountWeek}}, Месяц: {{.CountMonth}}</p>
-{{end}}
+    {{range .Timers}}
+        <div class="timer">
+            <p>Счетчик к "{{.Name}}". День: <span id="id-timer-id-{{.Id}}">id-timer-id-{{.Id}}</span></p>
+            <input type="button" value="Запустить" id="id-button-id-{{.Id}}">
+        </div>
+    {{end}}
 </div>
 <script src="static/js/client.js"></script>
 </body>

@@ -68,7 +68,7 @@ func initTrayMenu() {
 		}
 	}
 	/*
-		myselfStart = systray.AddMenuItem(getText("Start myself timer"), getText("Myself timer start"))
+		myselfStart = systray.AddMenuItem(getText("Start myself timer"), getText("Myself timer StartState"))
 		myselfStart.Hide()
 
 		myselfStop = systray.AddMenuItem(getText("Stop myself timer"), getText("Myself timer stop"))
@@ -103,14 +103,14 @@ func handleTimerStart(index int) {
 	//fmt.Println("Hello, it is Timer Start")
 	buttons[index][0].button.Hide()
 	buttons[index][1].button.Show()
-	handleEvent(buttons[index][0].timerId, start)
+	handleEvent(buttons[index][0].timerId, StartState)
 }
 
 func handleTimerStop(index int) {
 	//fmt.Println("Hello, it is Timer Stop")
 	buttons[index][1].button.Hide()
 	buttons[index][0].button.Show()
-	handleEvent(buttons[index][0].timerId, end)
+	handleEvent(buttons[index][0].timerId, EndState)
 }
 
 func handleSettings() {

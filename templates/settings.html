@@ -5,31 +5,34 @@
     <title>Настройки</title>
 </head>
 <body>
-<div>
-    <h3>Настройки</h3>
-    <table>
-        <tr>
-            <td>Название приложения</td>
-            <td><input type="text" name="app_name" value="{{.AppData.Title}}"></td>
-        </tr>
-        <tr>
-            <td>Подпись приложения</td>
-            <td><input type="text" name="app_tooltip" value="{{.AppData.Tooltip}}"></td>
-        </tr>
-        <tr>
-            <td colspan="2">Иконка приложения <input type="file"></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <img width="128" height="128" src="{{.AppData.IconLocation}}" alt="Icon">
-            </td>
-        </tr>
-    </table>
-    <br>
-</div>
-<p>
-    <input type="button" value="Сохранить">
-    <a href="menu">На главную</a>
-</p>
+<form method="POST" action="settingsSave" enctype="multipart/form-data">
+    <div>
+        <h3>Настройки</h3>
+        <table>
+            <tr>
+                <td>Название приложения</td>
+                <td><input type="text" name="app_name" value="{{.AppData.Title}}"></td>
+            </tr>
+            <tr>
+                <td>Подпись приложения</td>
+                <td><input type="text" name="app_tooltip" value="{{.AppData.Tooltip}}"></td>
+            </tr>
+            <tr>
+                <td colspan="2">Иконка приложения <input type="file"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <img width="128" height="128" src="{{.AppData.IconLocation}}" alt="Icon" name="app_icon">
+                </td>
+            </tr>
+        </table>
+        <br>
+    </div>
+    <p>
+        <input type="submit" value="Сохранить">
+        <a href="menu">На главную</a>
+    </p>
+</form>
+<script src="static/js/settings.js"></script>
 </body>
 </html>

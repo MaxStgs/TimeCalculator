@@ -1,9 +1,10 @@
 package main
 
 var (
-	lang = ru
-	port = "8593"
-	site = "localhost"
+	lang       = ru
+	port       = "8593"
+	site       = "localhost"
+	DebugLevel = DebugLevelFull
 )
 
 const (

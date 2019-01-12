@@ -5,18 +5,12 @@ import (
 	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 type IndexData struct {
-	Timers []TimerData
-}
-
-type TimerData struct {
-	TimerInfo  Timer
-	CountToday string
-	CountWeek  string
-	CountMonth string
+	Timers []Timer
 }
 
 type SettingsData struct {
@@ -29,10 +23,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	indexData := &IndexData{}
 	timers := LoadTimers()
 	for _, v := range timers {
-		countToday, countWeek, countMonth := calculateDates(v)
-		indexData.Timers = append(indexData.Timers,
-			TimerData{v, countToday, countWeek, countMonth},
-		)
+		indexData.Timers = append(indexData.Timers, v)
 	}
 	err := t.Execute(w, indexData)
 	if err != nil {
@@ -50,10 +41,16 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func settingsSaveHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(302)
+}
+
 func RunWebServer() {
 	routes := mux.NewRouter()
 	routes.HandleFunc("/", indexHandler)
+	routes.HandleFunc("/api/getTimeToday", handlerGetTimeToday)
 	routes.HandleFunc("/menu", indexHandler)
+	routes.HandleFunc("/settingsSave", settingsSaveHandler).Methods("POST")
 	routes.HandleFunc("/settings", settingsHandler)
 
 	http.Handle("/", routes)
@@ -68,44 +65,77 @@ func RunWebServer() {
 	}
 }
 
-func calculateDates(timer Timer) (countToday, countWeek, countMonth string) {
+func handlerGetTimeToday(w http.ResponseWriter, r *http.Request) {
+	idTimer := r.FormValue("idTimer")
+	if idTimer == "" {
+		http.Error(w, "Not found param idTimer", http.StatusBadRequest)
+		return
+	}
+	id, err := strconv.Atoi(idTimer)
+	if err != nil {
+		http.Error(w, "Server error", http.StatusBadRequest)
+		fmt.Println("Can't convert idTimer from " + idTimer + " to int" + err.Error())
+		return
+	}
+	calcTime := calculateDates(Timer{id, ""})
+	_, err = w.Write([]byte(calcTime))
+	if err != nil {
+		http.Error(w, "Server error", http.StatusBadRequest)
+		fmt.Println("Can't sent response to client: " + calcTime + " error: " + err.Error())
+		return
+	}
+	return
+}
+
+func calculateDates(timer Timer) (countToday string) {
 	events := LoadEventsByTimerId(timer.Id)
 	if events == nil {
 		return
 	}
-	/*lastId := -1
-	isLastStart := false
-	for k, v := range events {
-		if isLastStart == (v.State == start) {
-			lastId = k
-		} else if lastId != -1 {
-			if lastId < v.Id {
-
-			} else {
-
-			}
-		} else {
-			continue
-		}
-	}*/
 	countToday = calculateToday(events)
 	return
 }
 
 func calculateToday(events []Event) (countToday string) {
-	count := time.Now()
+	Count := 0.0
+	var CountTime time.Time
+	NextEvent := StartState
+	var LastEventTime time.Time
 	for _, v := range events {
 		// 2006 - longYear, 1 - stdNumMonth, 2 - stdDay
-		moment, err := time.Parse("2006-01-02T15:04:05.99999Z07:00", v.Moment)
+		Moment, err := time.Parse("2006-01-02T15:04:05.99999Z07:00", v.Moment)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		//fmt.Println(moment.Sub(time.Now()).Nanoseconds())
-		if time.Now().Sub(moment).Nanoseconds() > 0 {
-			fmt.Println("Got today events")
+
+		result := time.Now().Sub(Moment)
+		if result > 0 {
+			if err != nil {
+				fmt.Print(err.Error())
+				continue
+			}
+
+			// Today event handler
+			if v.State == NextEvent {
+				if NextEvent == StartState {
+					NextEvent = EndState
+					LastEventTime = Moment
+				} else {
+					NextEvent = StartState
+					diff := Moment.Sub(LastEventTime)
+					CountTime = CountTime.Add(diff)
+					Count += diff.Seconds()
+					if DebugLevel == DebugLevelFull {
+						fmt.Printf("Added %f seconds\n", diff.Seconds())
+					}
+				}
+			} else {
+				continue
+			}
 		}
 	}
-	// 15 - Hours, 4 - Minutes, 5 - Seconds
-	countToday = count.Format("15:4:5")
+	countToday = CountTime.String()
+	fmt.Printf("Today timer: %f\n", Count)
+	fmt.Println("Today returned:", CountTime)
 	return
 }
