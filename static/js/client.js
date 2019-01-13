@@ -15,19 +15,13 @@ function loadButtonHandlers() {
     timerList = new Array(buttons.length);
     for (let button of buttons) {
         let id = button.id.split('id-button-id-')[1];
+        let parent = button.parentNode;
         button.onclick = function () {
-            let parent = button.parentNode;
             if (parent.classList.contains("timer-run")) {
-                // Disable
-                parent.classList.remove("timer-run");
-                button.value = "Запустить";
-                socket.send(constructSocketData("StopTimer"));
+                socket.send(constructSocketData("StopTimer", id));
                 stopTimer(id);
             } else {
-                // Enable
-                button.value = "Остановить";
-                parent.classList.add("timer-run");
-                socket.send(constructSocketData("StartTimer"));
+                socket.send(constructSocketData("StartTimer", id));
                 startTimer(id);
             }
         }
@@ -49,14 +43,19 @@ function updateTimer(timerText) {
     timerText.textContent = date.toTimeString().split(' GMT')[0];
 }
 
-function constructSocketData(action) {
+function constructSocketData(action, value) {
     return JSON.stringify({
         "UserId": userId,
-        "Action": action
+        "Action": action,
+        "Value" : value
     })
 }
 
 function startTimer(id) {
+    let button = document.getElementById("id-button-id-" + id);
+    let parent = button.parentNode;
+    parent.classList.add("timer-run");
+    button.value = "Остановить";
     timerList[id] = setInterval(function () {
         let elem = document.querySelector("span[id='id-timer-id-" + id + "'");
         updateTimer(elem);
@@ -64,6 +63,10 @@ function startTimer(id) {
 }
 
 function stopTimer(id) {
+    let button = document.getElementById("id-button-id-" + id);
+    let parent = button.parentNode;
+    parent.classList.remove("timer-run");
+    button.value = "Запустить";
     clearInterval(timerList[id]);
 }
 
@@ -110,11 +113,13 @@ function connectSocket() {
     socket.onmessage = function (event) {
         console.log("WebSocket got message:" + event.data);
         json = JSON.parse(event.data);
-        if(json.UserId !== userId) {
+        // Todo: Sometimes from server come package without UserID
+        /*if(json.UserId !== userId) {
             console.log("I got not my message")
         } else {
             handleAction(json.Action, json.Value)
-        }
+        }*/
+        handleAction(json.Action, json.Value)
     };
 
     socket.onerror = function (error) {

@@ -90,6 +90,7 @@ func handlerGetTimeToday(w http.ResponseWriter, r *http.Request) {
 func calculateDates(timer Timer) (countToday string) {
 	events := LoadEventsByTimerId(timer.Id)
 	if events == nil {
+		countToday = time.Time{}.String()
 		return
 	}
 	countToday = calculateToday(events)
@@ -108,8 +109,9 @@ func calculateToday(events []Event) (countToday string) {
 			fmt.Println(err.Error())
 		}
 
-		result := time.Now().Sub(Moment)
-		if result > 0 {
+		now := time.Now()
+		result := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).Sub(Moment)
+		if result < 0 {
 			if err != nil {
 				fmt.Print(err.Error())
 				continue
@@ -118,7 +120,7 @@ func calculateToday(events []Event) (countToday string) {
 			// Today event handler
 			if v.State == NextEvent {
 				if NextEvent == StartState {
-					NextEvent = EndState
+					NextEvent = StopState
 					LastEventTime = Moment
 				} else {
 					NextEvent = StartState

@@ -14,13 +14,14 @@ var upgrader = websocket.Upgrader{
 }
 
 type Message struct {
-	UserID int    `json:"UserId,omitempty"`
+	UserID int    `json:"UserID,omitempty"`
 	Action string `json:"Action,omitempty"`
 	Value  string `json:"Value,omitempty"`
 }
 
 type User struct {
 	UserID int
+	Conn   *websocket.Conn
 }
 
 var Users []User
@@ -32,7 +33,7 @@ func RunSocketServer() {
 			fmt.Println("WebSocket connection error: " + err.Error())
 			return
 		}
-		User := User{len(Users)}
+		User := User{len(Users), conn}
 		userId := strconv.Itoa(User.UserID)
 		if userId == "" {
 			fmt.Println("Got problem with convert userId")
@@ -76,6 +77,37 @@ func RunSocketServer() {
 func handleMessage(message Message) {
 	switch message.Action {
 	case "StartTimer":
+		index, err := strconv.Atoi(message.Value)
+		index -= 1
+		if err != nil {
+			fmt.Println("Can't StartTimer : " + err.Error())
+			return
+		}
+		handleTimerStart(index)
 	case "StopTimer":
+		index, err := strconv.Atoi(message.Value)
+		index -= 1
+		if err != nil {
+			fmt.Println("Can't StopTimer : " + err.Error())
+			return
+		}
+		handleTimerStop(index)
+	}
+}
+
+func sendMessage(message Message, users []User) {
+	for k, v := range users {
+		message.UserID = 0
+		// TODO: Client not get UserID and think that it is not his package
+		data, err := json.Marshal(message)
+		if err != nil {
+			fmt.Println("WebSocket can't marshal sendMessage " + message.Action + " with value: " + message.Value + " to UserID(" + strconv.Itoa(v.UserID) + ")")
+			continue
+		}
+		if err = v.Conn.WriteMessage(1, data); err != nil {
+			Users = append(Users[:k], Users[k+1:]...)
+			fmt.Println("Removed socket from Users with index:" + strconv.Itoa(v.UserID) + " reason:" + "socket close")
+			continue
+		}
 	}
 }

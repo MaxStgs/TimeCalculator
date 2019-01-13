@@ -23,7 +23,7 @@ type EventState string
 const (
 	UnknownState EventState = "U"
 	StartState   EventState = "S"
-	EndState     EventState = "E"
+	StopState    EventState = "E"
 )
 
 type EventType string

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/getlantern/systray"
 	"github.com/pkg/browser"
+	"strconv"
 )
 
 var (
@@ -59,9 +60,9 @@ func initTrayMenu() {
 				for {
 					select {
 					case <-timerStart.ClickedCh:
-						handleTimerStart(index)
+						handleMenuItemClickTimerStart(index)
 					case <-timerEnd.ClickedCh:
-						handleTimerStop(index)
+						handleMenuItemClickTimerStop(index)
 					}
 				}
 			}()
@@ -99,18 +100,26 @@ func trayUpdate() {
 
 }
 
+func handleMenuItemClickTimerStart(index int) {
+	handleTimerStart(index)
+	sendMessage(Message{-1, "StartTimer", strconv.Itoa(index + 1)}, Users)
+}
+
+func handleMenuItemClickTimerStop(index int) {
+	sendMessage(Message{-1, "StopTimer", strconv.Itoa(index + 1)}, Users)
+	handleTimerStop(index)
+}
+
 func handleTimerStart(index int) {
-	//fmt.Println("Hello, it is Timer Start")
-	buttons[index][0].button.Hide()
 	buttons[index][1].button.Show()
+	buttons[index][0].button.Hide()
 	handleEvent(buttons[index][0].timerId, StartState)
 }
 
 func handleTimerStop(index int) {
-	//fmt.Println("Hello, it is Timer Stop")
 	buttons[index][1].button.Hide()
 	buttons[index][0].button.Show()
-	handleEvent(buttons[index][0].timerId, EndState)
+	handleEvent(buttons[index][0].timerId, StopState)
 }
 
 func handleSettings() {
